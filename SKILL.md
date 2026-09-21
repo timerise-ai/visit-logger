@@ -149,3 +149,5 @@ admin page --> readVisitSummary --> groupVisitsIntoSessions --> <VisitHistory>
 | Running it | GDPR, retention, purge, erasure, pg_cron, mail scanner, Safe Links, internal traffic, debugging | [operations.md](references/operations.md) |
 | Proving it | vitest, bun test, test cases, fixtures | [testing.md](references/testing.md) |
 | What the audit changed and why | provenance, defect, audit, kept deliberately, upgrading an existing log | [provenance.md](references/provenance.md) |
+
+Part of the [Timerise Skills](https://github.com/timerise-ai/skills) index, which lists the sibling skills.

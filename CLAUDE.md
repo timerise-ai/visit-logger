@@ -22,8 +22,9 @@ anything.
 
 ## Structure
 
-- `SKILL.md`: entry point, loaded whole on every activation, so it stays between 130 and 160 lines. The
-  frontmatter `description` is the trigger surface.
+- `SKILL.md`: entry point, loaded whole on every activation, so it stays between 130 and 160 lines, the
+  closing index line aside. The frontmatter `description` is the trigger surface, and the body closes with a
+  line linking the skills index.
 - `README.md`: the human-facing front door, in the section order every Timerise skill shares.
 - `CHANGELOG.md`: Keep a Changelog, newest release first. The version lives here, in the README's
   current-release line, and in the git tag, and the three agree.
