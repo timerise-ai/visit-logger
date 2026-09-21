@@ -23,7 +23,7 @@ which any Next.js app has.
 |---|---|
 | `core.test.ts` | sittings join and split on the gap from the last view; visitors interleave; input not mutated; bot taint; entry referrer; counts exclude bots and staff; truncated `firstAt`; the announcement matrix; origin preference and fallbacks |
 | `fingerprint.test.ts` | Vercel IP and decoded city; malformed escape survives; major-only client line; every automated client flagged and no real browser flagged (CUBOT included); Cloudflare Latin-1 repair; `noEdge`; the full `isPageView` contract |
-| `record.test.ts` | first → quiet → back; NULL IP matches NULL IP; bots and staff stored, never announced, never "prior"; read failure announces; write failure is quiet; truncation with the real first visit; failed reads say so; subject normalisation both ways |
+| `record.test.ts` | first, then quiet, then back; NULL IP matches NULL IP; bots and staff stored, never announced, never "prior"; read failure announces; write failure is quiet; truncation with the real first visit; failed reads say so; subject normalisation both ways |
 
 ## Rules
 
@@ -83,7 +83,7 @@ describe("groupVisitsIntoSessions", () => {
   });
 
   it("measures the gap from the last page view, not the first", () => {
-    // 0 → 25 → 50: every gap is 25 min, the span is 50. One sitting.
+    // 0, 25, 50: every gap is 25 min, the span is 50. One sitting.
     expect(groupVisitsIntoSessions([visit(0), visit(25), visit(50)])).toHaveLength(1);
   });
 
@@ -217,7 +217,7 @@ describe("pickOriginEvent", () => {
 import { describe, expect, it } from "vitest";
 
 import { cloudflareEdge, describeVisitor, isPageView, noEdge, utf8FromLatin1 } from "./fingerprint";
-import { formatVisitClient, formatVisitLocation } from "./types";
+import { formatVisitClient, formatVisitLocation, FRAGMENT_SEPARATOR } from "./types";
 
 const CHROME_MAC =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
@@ -253,7 +253,9 @@ describe("describeVisitor on Vercel", () => {
 
   it("parses the browser and formats the major version only", () => {
     expect(fingerprint).toMatchObject({ browser: "Chrome", os: "Mac OS", deviceType: "desktop", isBot: false });
-    expect(formatVisitClient(fingerprint)).toBe("Chrome 131 · Mac OS · desktop");
+    expect(formatVisitClient(fingerprint)).toBe(
+      ["Chrome 131", "Mac OS", "desktop"].join(FRAGMENT_SEPARATOR),
+    );
   });
 
   it("falls back to x-real-ip and survives a malformed escape", () => {
@@ -331,7 +333,7 @@ describe("isPageView", () => {
     ["a <Link> prefetch", { rsc: "1", "next-router-prefetch": "1" }, false],
     ["a segment prefetch", { rsc: "1", "next-router-segment-prefetch": "/_tree" }, false],
     ["a Server Action", { "next-action": "abc123", "sec-fetch-dest": "empty" }, false],
-  ])("%s → %s", (_label, init, expected) => {
+  ])("%s is a page view: %s", (_label, init, expected) => {
     expect(isPageView(headers(init))).toBe(expected);
   });
 });
@@ -502,7 +504,7 @@ describe("visitor events", () => {
 ## What is not tested here
 
 - **The Supabase and Firestore stores against a live database.** The Supabase
-  queries are the source's production queries, renamed. The migration they
+  queries are the earlier implementation's, renamed. The migration they
   run against was verified on PostgreSQL 18 ([data-model.md](data-model.md)).
   The Firestore store has never run.
 - **`after()` scheduling.** `trackPageVisit` and `trackVisitorEvent` are thin;

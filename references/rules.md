@@ -261,8 +261,8 @@ bounded, newest-first read, so it needs to be told two things:
 - `truncated`: more rows exist than were read. The panel then says "at least".
 - `firstAt`: when truncated, the real first human visit, from its own query.
   Without it, a resource with more page views than the limit reports a "first
-  opened" date that is merely the oldest row that fitted. The source did exactly
-  that, with no signal on screen.
+  opened" date that is merely the oldest row that fitted. The earlier
+  implementation did exactly that, with no signal on screen.
 
 `readVisitSummary` in [recording.md](recording.md) does both: it reads
 `limit + 1` rows to learn whether there are more, and pays for the first-visit

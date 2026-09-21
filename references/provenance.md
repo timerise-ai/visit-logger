@@ -1,23 +1,29 @@
 # Provenance
 
-The source is a production Next.js 16 marketing and sales site on Vercel with
-Supabase. Two logs shared one fingerprint helper there:
+This is the engineering ledger for the person editing the skill, not a story
+for the reader of the README. It separates three things: what the audit of the
+earlier implementation changed and how the templates verify it, what was kept
+deliberately and why it is safe, and what was designed here and has never run
+in production.
 
-- **Demo visits.** Customer demo builds served by a gated route handler, one
-  row per HTML page view, grouped into sittings in an internal console, with a
-  Slack "customer opened the demo" message.
+The earlier implementation was a sales site on Next.js with Supabase, where two
+logs shared one fingerprint helper:
+
+- **Resource visits.** Gated builds served by a route handler, one row per HTML
+  page view, grouped into sittings in an internal console, with a Slack
+  "customer opened it" message.
 - **Account events.** Sign-in link requested, account created, signed in and
-  first brief, with a "signed up from" line on the customer's console page.
+  first resource, with a "signed up from" line on the customer's console page.
 
-About eight files: the fingerprint helper, two stores, two migrations, two
-console panels and the Slack origin block. No test covered any of it.
+A fingerprint helper, two stores, two migrations, two console panels and the
+Slack origin block. No test covered any of it.
 
-The architecture here is the source's. The templates are not a transcription,
-and this ledger says why. Every entry was verified by reading the source.
+The architecture here is that one's. The templates are not a transcription, and
+this ledger says why. Every entry was verified by reading the code it describes.
 Entries marked **reproduced** were also run: user-agent claims through Next
 16.2.12's own `userAgent()`, header decoding through Node 22's HTTP parser, SQL
 on PostgreSQL 18 with Supabase's roles and default privileges recreated.
-Supabase Auth behaviour was checked against the auth server's source.
+Supabase Auth behaviour was checked against the auth server's own code.
 
 ## Fixed in the templates
 
@@ -64,7 +70,7 @@ had never looked, which is the one wrong answer a salesperson acts on.
 ### 5. Browser version in full, device guessed for scripts (reproduced)
 
 Chrome showed as "131.0.0.0". The parser leaves the device type undefined for
-desktops, and the source defaulted it to `"desktop"` for everything, including
+desktops, and it was defaulted to `"desktop"` for everything, including
 `curl` and a request with no user agent; `python-requests` parsed as
 `"wearable"`.
 
@@ -129,14 +135,14 @@ fallback, beside the shared helper. They would drift the day the edge changed.
 
 ## Changed without a defect
 
-- Renamed to neutral vocabulary: `demo_visits` → `page_visits`, `brief_id` →
-  `resource_id`, `demo_folder` → `resource_key`, `email` → `subject`, `token` →
-  `link`, `admin` → `internal`, `otp_requested` → `link_requested`,
-  `brief_created` → `resource_created`.
+- Renamed to neutral vocabulary: `demo_visits` to `page_visits`, `brief_id` to
+  `resource_id`, `demo_folder` to `resource_key`, `email` to `subject`, `token`
+  to `link`, `admin` to `internal`, `otp_requested` to `link_requested`,
+  `brief_created` to `resource_created`.
 - The "service role has full access" RLS policy dropped: `service_role`
   bypasses RLS, so it granted nothing. RLS on and the `REVOKE` kept.
-- Formatters return `null` and language-neutral fragments. The source's
-  "Unknown location" and "on" are now host strings.
+- Formatters return `null` and language-neutral fragments. The earlier
+  implementation's "Unknown location" and "on" are now host strings.
 - A sitting carries its entry `referrer`.
 - The store is a factory resolved inside `after()`.
 
@@ -156,7 +162,7 @@ fallback, beside the shared helper. They would drift the day the edge changed.
 - The memory store, the three suites, and the structure-only panels with
   strings objects.
 
-## If you are porting the original
+## If you are upgrading an existing log
 
 Most damaging first:
 

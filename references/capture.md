@@ -7,14 +7,14 @@ type-check here and fail loudly if copied unreplaced.
 
 | Capture point | Status | Page view test |
 |---|---|---|
-| Route handler serving a gated static build (demo, report) | proven in the source | HTML content type **and** `isPageView` |
+| Route handler serving a gated static build (demo, report) | shipped in the earlier implementation | HTML content type **and** `isPageView` |
 | App Router page (Server Component) | designed here | `isPageView(await headers())` |
 | `proxy.ts` | not recommended | the viewer is not known yet, the route may 404, and the matcher sees every asset |
 | Client beacon (`navigator.sendBeacon`) | not shipped | only if time-on-page matters; it is a client analytics feature |
 
 ## A gated static build, served by a route handler
 
-The source's shape: a folder of built HTML, CSS and JS served by one route
+The shape it was built for: a folder of built HTML, CSS and JS served by one route
 handler to whoever may see it. Every asset goes through the same handler, so
 the HTML check is essential. Without it, one page view is fourteen rows.
 
@@ -157,8 +157,8 @@ subject's first resource, with the same `trackVisitorEvent` call.
 ### The first-sign-in trap
 
 `signInWithOtp` with `shouldCreateUser: true` creates the auth user **when the
-link is requested**. `created_at` is therefore the request time. The source
-decided "new account" by `created_at` being under five minutes old at the
+link is requested**. `created_at` is therefore the request time. The earlier
+implementation decided "new account" by `created_at` being under five minutes old at the
 callback, so anyone who opened the email more than five minutes after asking
 for it was recorded as `signed_in`. The host's "new workspace" notification,
 gated on the same test, never fired for them. The auth server's source shows

@@ -28,6 +28,7 @@ Schedule the purge from the migration ([data-model.md](data-model.md)). With
 pg_cron on Supabase:
 
 ```sql
+-- run: once, as the service role (Supabase SQL editor or psql)
 SELECT cron.schedule(
   'purge-visit-network-data',
   '17 3 * * *',
@@ -51,6 +52,7 @@ old visits entirely.
 A subject's rows, on request:
 
 ```sql
+-- run: on an erasure request, as the service role
 DELETE FROM public.page_visits    WHERE subject = $1;
 DELETE FROM public.visitor_events WHERE subject = $1;
 ```
@@ -65,6 +67,7 @@ Stored status needs a cron that can fail silently. These are derived, and
 cheap:
 
 ```sql
+-- run: as a health check, as the service role
 -- The client roles are locked out. Both must be false.
 SELECT has_table_privilege('anon', 'public.page_visits', 'SELECT') AS anon_can_read,
        has_table_privilege('authenticated', 'public.visitor_events', 'INSERT') AS user_can_forge;
@@ -103,7 +106,7 @@ to preview through the admin page.
 
 **Two page views in the same few milliseconds.** The announcement reads prior
 visits, then inserts. Two requests that interleave can both see "no prior
-visit" and announce twice. The source accepted one duplicate ping. If it
+visit" and announce twice. The earlier implementation accepted one duplicate ping. If it
 matters, move the assessment and the insert into one Postgres function that
 takes `pg_advisory_xact_lock` on the resource id first; that function is a
 design, not verified here.
@@ -111,13 +114,14 @@ design, not verified here.
 **Shared networks.** Same office, same browser build: one visitor
 ([rules.md](rules.md)).
 
-## Porting an existing log
+## Upgrading an existing log
 
 When the host already has a visit log, check it against the ledger in
 [provenance.md](provenance.md) in its fix order. The first-sign-in check, on
 Supabase, tells you how many accounts an age-based "new user" test misfiled:
 
 ```sql
+-- run: once against the host's database, as the service role
 SELECT count(*) AS misfiled_as_returning
   FROM auth.users
  WHERE email_confirmed_at - created_at > INTERVAL '5 minutes';

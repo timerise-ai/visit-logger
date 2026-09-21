@@ -205,8 +205,8 @@ export async function findOriginEvent<K extends string>(
 }
 ```
 
-`normalizeSubject` runs on the way in *and* on the way out. The source
-lower-cased on both sides too; a store that normalises only on write finds
+`normalizeSubject` runs on the way in *and* on the way out. The earlier
+implementation lower-cased on both sides too; a store that normalises only on write finds
 nothing when an admin page passes the address as the account has it.
 
 ## Request-side entry points

@@ -31,11 +31,12 @@ lifecycle moment worth a fingerprint. The insight that shapes the module is that
 and reloads all arrive as requests. Every rule here exists to filter them out
 before anyone gets told "the customer opened it".
 
-Extracted from a production Next.js 16 site on Vercel and Supabase, where it
-records customer demo opens and sign-up origin. It was audited before
-extraction. [provenance.md](references/provenance.md) records what was fixed,
-what was kept deliberately, and what was added here without ever running in
-production.
+Written by the engineer who has shipped this module. The earlier
+implementation it was audited against was a visit log on a sales site, behind
+the shared links a team sends customers and on its sign-in routes.
+[provenance.md](references/provenance.md) is the ledger: what the audit changed
+and how the templates verify it, what was kept deliberately, and what was
+designed here and has never run in production.
 
 ## When to use
 
@@ -57,21 +58,21 @@ production.
 ## Architecture
 
 ```
-request ─> route handler / Server Component (host authorises the viewer)
-            │
-            ├─ isPageView(headers)? ── no ──> serve; log nothing
-            │     prefetch, <Link> prefetch, iframe, asset, Server Action
-            │
-            ├─ describeVisitor(request, edge)   synchronous: IP, geo, UA, isBot
-            │
-            └─ after() ─────────────────────── response already sent
-                 recordPageVisit(store, visit)
-                   ├─ bot or internal ─> insert only, never announce
-                   ├─ readPriorVisits ─> assessVisit: first? new visitor? back?
-                   └─ insert ─> announce(assessment, fingerprint)?
+request --> route handler / Server Component (the host authorises the viewer)
+             |
+             +- isPageView(headers)? .. no ...> serve, log nothing
+             |    prefetch, <Link> prefetch, iframe, asset, Server Action
+             |
+             +- describeVisitor(request, edge)  synchronous: IP, geo, UA, isBot
+             |
+             +- after() ......................> response already sent
+                  recordPageVisit(store, visit)
+                    +- bot or internal .> insert only, never announce
+                    +- readPriorVisits .> assessVisit: first? new visitor? back?
+                    +- insert ..........> announce(assessment, fingerprint)?
 
-admin page ─> readVisitSummary ─> groupVisitsIntoSessions ─> <VisitHistory>
-          ─> readVisitorEvents / findOriginEvent ─> <VisitorActivity>
+admin page --> readVisitSummary --> groupVisitsIntoSessions --> <VisitHistory>
+           --> readVisitorEvents / findOriginEvent ---------> <VisitorActivity>
 ```
 
 ## Critical facts
@@ -147,4 +148,4 @@ admin page ─> readVisitSummary ─> groupVisitsIntoSessions ─> <VisitHistory
 | The admin panels | visit history, activity, badge, bot row, "first opened", duration | [admin-ui.md](references/admin-ui.md) |
 | Running it | GDPR, retention, purge, erasure, pg_cron, mail scanner, Safe Links, internal traffic, debugging | [operations.md](references/operations.md) |
 | Proving it | vitest, bun test, test cases, fixtures | [testing.md](references/testing.md) |
-| What changed from the source and why | provenance, defect, audit, kept deliberately, porting the original | [provenance.md](references/provenance.md) |
+| What the audit changed and why | provenance, defect, audit, kept deliberately, upgrading an existing log | [provenance.md](references/provenance.md) |

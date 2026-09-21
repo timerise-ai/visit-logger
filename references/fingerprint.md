@@ -138,7 +138,13 @@ export function formatVisitLocation(
   return parts.length > 0 ? parts.join(", ") : null;
 }
 
-/** "Chrome 131 · Mac OS · desktop", or null when nothing was parsed. */
+/** Separator between the fragments of a formatted line. A middle dot. */
+export const FRAGMENT_SEPARATOR = " \u00b7 ";
+
+/**
+ * Browser, OS and device type joined by FRAGMENT_SEPARATOR, or null when
+ * nothing was parsed.
+ */
 export function formatVisitClient(
   visit: Pick<VisitFingerprint, "browser" | "browserVersion" | "os" | "deviceType">,
 ): string | null {
@@ -146,7 +152,7 @@ export function formatVisitClient(
   const major = visit.browserVersion?.split(".")[0] ?? null;
   const browser = [visit.browser, major].filter(Boolean).join(" ");
   const parts = [browser, visit.os, visit.deviceType].filter(Boolean);
-  return parts.length > 0 ? parts.join(" · ") : null;
+  return parts.length > 0 ? parts.join(FRAGMENT_SEPARATOR) : null;
 }
 
 /** Where a request came from, formatted once for every notifier and panel. */
@@ -416,7 +422,7 @@ header names come from Next 16.2's own router constants; the behaviour has not
 been exercised in production. A `router.refresh()` is an RSC request with no
 prefetch header and counts as a page view; that is usually what you want.
 
-A route handler that serves HTML files, as in the source, only ever sees the
+A route handler that serves HTML files, as in the earlier implementation, only ever sees the
 first six rows. Check the content type as well: only an HTML response is a page.
 
 ## Fingerprint checklist

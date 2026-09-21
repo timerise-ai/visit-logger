@@ -8,7 +8,7 @@ implementation below is idiomatic for its backend, and each throws on failure;
 
 | Implementation | Status | Use it when |
 |---|---|---|
-| `createSupabaseVisitStore` | the source's queries, renamed; type-checked | Supabase, or any Postgres reached through supabase-js |
+| `createSupabaseVisitStore` | the earlier implementation's queries, renamed; type-checked | Supabase, or any Postgres reached through supabase-js |
 | `createFirestoreVisitStore` | designed here; type-checked against firebase-admin 14, not run | Firebase / Firestore hosts |
 | `createMemoryVisitStore` | the test double; runs in every suite | tests, and local prototyping before the table exists |
 
@@ -234,8 +234,8 @@ Notes:
 - **Generated types.** Typed as `SupabaseClient<Database>`, the row interfaces
   and the `as PageVisitRow[]` casts can go; keep `toColumns` and `fromColumns`,
   which are the single mapping between the fingerprint and its twelve columns.
-  The source wrote that mapping out four times, once per insert and once per
-  reader.
+  The earlier implementation wrote that mapping out four times, once per
+  insert and once per reader.
 
 ## Firestore
 

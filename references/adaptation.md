@@ -98,7 +98,7 @@ Writing a custom adapter is three lines; see `EdgeHeaders` in
 order of the checks matters:
 
 1. **Staff first.** A staff member opening the customer's link is `internal`,
-   even though the link would also let them in. In the source, a super admin
+   even though the link would also let them in. In the earlier implementation, a super admin
    holding the customer's token cookie kept showing up as the customer until
    the admin check was made to win over the token. Check for a staff session
    whenever one is present.
@@ -111,7 +111,8 @@ opening a resource that no customer owns yet has nothing to be attributed to.
 ## Strings
 
 The panels take a strings object; the formatters return language-neutral
-fragments (`"Kraków, 12, PL"`, `"Chrome 131 · Mac OS · desktop"`) or `null`.
+fragments (a location such as `"Kraków, 12, PL"`, and a client line of
+browser, OS and device joined by `FRAGMENT_SEPARATOR`) or `null`.
 
 - **Host has i18n**: build `VisitHistoryStrings` and `VisitorActivityStrings`
   from its dictionaries, in every locale, including the plural functions.

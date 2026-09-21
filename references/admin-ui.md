@@ -8,9 +8,9 @@ host's card, badge and list primitives on them, and its i18n behind the strings.
 
 | Panel | Shows | States |
 |---|---|---|
-| Visit history | summary line (visits · page views · first · last), then one row per sitting: via badge, bot badge, start time, location, client · timezone · page views · duration | failed, empty, list; "at least" when truncated |
-| Visitor activity | one row per lifecycle event, newest first: kind label, bot badge, time, location, client · timezone | failed, empty, list; "more" note when truncated |
-| Origin line | "Signed up from Kraków, 12, PL · Chrome 131 · Mac OS · desktop · Europe/Warsaw · <date>" under the page title | absent when there is no origin event |
+| Visit history | summary line (visits, page views, first, last), then one row per sitting: via badge, bot badge, start time, location, and client, timezone, page views and duration joined by `FRAGMENT_SEPARATOR` | failed, empty, list; "at least" when truncated |
+| Visitor activity | one row per lifecycle event, newest first: kind label, bot badge, time, and client and timezone joined by `FRAGMENT_SEPARATOR` | failed, empty, list; "more" note when truncated |
+| Origin line | "Signed up from", then location, client, timezone and date joined by `FRAGMENT_SEPARATOR`, under the page title | absent when there is no origin event |
 
 Behaviour that must survive restyling:
 
@@ -31,6 +31,7 @@ Behaviour that must survive restyling:
 import {
   formatVisitClient,
   formatVisitLocation,
+  FRAGMENT_SEPARATOR,
   type VisitSession,
   type VisitSummary,
   type VisitVia,
@@ -103,9 +104,13 @@ export function VisitHistory({
       ) : (
         <>
           <p>
-            {bound(strings.visits(sessionCount))} · {bound(strings.pageViews(pageViewCount))}
-            {firstAt && <> · {strings.first(formatTimestamp(firstAt))}</>}
-            {lastAt && lastAt !== firstAt && <> · {strings.last(formatTimestamp(lastAt))}</>}
+            {bound(strings.visits(sessionCount))}
+            {FRAGMENT_SEPARATOR}
+            {bound(strings.pageViews(pageViewCount))}
+            {firstAt && <>{FRAGMENT_SEPARATOR}{strings.first(formatTimestamp(firstAt))}</>}
+            {lastAt && lastAt !== firstAt && (
+              <>{FRAGMENT_SEPARATOR}{strings.last(formatTimestamp(lastAt))}</>
+            )}
           </p>
 
           <ul>
@@ -126,7 +131,7 @@ export function VisitHistory({
                       minutes === null ? null : strings.duration(minutes),
                     ]
                       .filter(Boolean)
-                      .join(" · ")}
+                      .join(FRAGMENT_SEPARATOR)}
                   </small>
                 </li>
               );
@@ -146,6 +151,7 @@ export function VisitHistory({
 import {
   formatVisitClient,
   formatVisitLocation,
+  FRAGMENT_SEPARATOR,
   type VisitorEventList,
 } from "@/lib/visits/types";
 
@@ -190,7 +196,7 @@ export function VisitorActivity<K extends string>({
               <time dateTime={event.createdAt}>{formatTimestamp(event.createdAt)}</time>
               <span>{formatVisitLocation(event) ?? strings.unknownLocation}</span>
               <small>
-                {[formatVisitClient(event), event.timezone].filter(Boolean).join(" · ")}
+                {[formatVisitClient(event), event.timezone].filter(Boolean).join(FRAGMENT_SEPARATOR)}
               </small>
             </li>
           ))}
@@ -215,7 +221,7 @@ import { VisitHistory } from "@/components/visits/VisitHistory";
 import { VisitorActivity, type VisitorActivityStrings } from "@/components/visits/VisitorActivity";
 import { findOriginEvent, readVisitorEvents, readVisitSummary } from "@/lib/visits/record";
 import { getVisitStore } from "@/lib/visits/store";
-import { formatVisitClient, formatVisitLocation } from "@/lib/visits/types";
+import { formatVisitClient, formatVisitLocation, FRAGMENT_SEPARATOR } from "@/lib/visits/types";
 
 type Kind = "link_requested" | "account_created" | "signed_in" | "resource_created";
 
@@ -265,7 +271,7 @@ export default async function AdminProposalPage({ params }: { params: Promise<{ 
             formatTimestamp(origin.createdAt),
           ]
             .filter(Boolean)
-            .join(" · ")}
+            .join(FRAGMENT_SEPARATOR)}
         </p>
       )}
       <VisitHistory summary={visits} formatTimestamp={formatTimestamp} />
@@ -277,7 +283,7 @@ export default async function AdminProposalPage({ params }: { params: Promise<{ 
 
 ## Extensions worth building (not shipped)
 
-These are gaps an operator will hit. None is in the source:
+These are gaps an operator will hit. None was in the earlier implementation:
 
 | Gap | Design |
 |---|---|
