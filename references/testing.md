@@ -1,6 +1,6 @@
 # Testing
 
-Three suites, 54 tests. They cover the claims the skill makes: the rules in
+Three suites, 55 tests. They cover the claims the skill makes: the rules in
 [rules.md](rules.md), the fingerprint and page-view contract in
 [fingerprint.md](fingerprint.md), and the failure contract in
 [recording.md](recording.md), against the memory store from
@@ -10,11 +10,18 @@ All three import from `vitest`. `bun test` rewrites that import to its own
 runner, so they run unchanged under either:
 
 ```bash
+npm i -D vitest                # the registry is not an external service
 npx vitest run lib/visits      # vitest
 bun test lib/visits            # bun
 ```
 
-Verified under vitest 5 and bun 1.2 (54 passing in each), and type-checked
+Wire one of them to `npm test` (`"test": "vitest run"`) and copy the three
+files unchanged. Never convert them to `node:test` or another runner, and never
+edit an assertion to make it pass: a converted suite is new code that proves
+nothing about the templates. Tests of the host's own code go in files beside
+them.
+
+Verified under vitest 5 and bun 1.2 (55 passing in each), and type-checked
 with TypeScript 6 under `strict` and `noUncheckedIndexedAccess` together with
 every other code block in the skill. `fingerprint.test.ts` needs `next/server`,
 which any Next.js app has.
@@ -333,6 +340,7 @@ describe("isPageView", () => {
     ["a <Link> prefetch", { rsc: "1", "next-router-prefetch": "1" }, false],
     ["a segment prefetch", { rsc: "1", "next-router-segment-prefetch": "/_tree" }, false],
     ["a Server Action", { "next-action": "abc123", "sec-fetch-dest": "empty" }, false],
+    ["a client navigation as a page's headers() shows it", { "sec-fetch-dest": "empty" }, false],
   ])("%s is a page view: %s", (_label, init, expected) => {
     expect(isPageView(headers(init))).toBe(expected);
   });
@@ -515,6 +523,6 @@ describe("visitor events", () => {
 
 ## Testing checklist
 
-- [ ] All three suites copied and passing in the host's runner
+- [ ] All three suites copied unchanged, wired to `npm test`, 55 passing under vitest or bun
 - [ ] A new `looksAutomated` pattern arrives with a test row for it, and a real-browser row it must not match
 - [ ] One end-to-end open in the running host: row written, bot flag right, announcement received once

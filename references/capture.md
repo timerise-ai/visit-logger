@@ -113,9 +113,10 @@ declare function authoriseViewer(
 /**
  * A resource rendered by the App Router rather than served as a file. The
  * page runs for the document request, for a client-side navigation (an RSC
- * fetch) and for a `<Link>` prefetch; `isPageView` counts the first two.
- * Reading `headers()` makes the page dynamic, which it must be: on a static
- * page `after()` runs at build time.
+ * fetch) and for a `<Link>` prefetch. `headers()` hides the RSC headers, so
+ * here `isPageView` counts the document request only. Reading `headers()`
+ * makes the page dynamic, which it must be: on a static page `after()` runs
+ * at build time.
  */
 export default async function ProposalPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -142,8 +143,20 @@ export default async function ProposalPage({ params }: { params: Promise<{ id: s
 ```
 
 The page component runs for the document request, for a client-side navigation
-to it (an RSC request), and for a `<Link>` prefetch; `isPageView` keeps the
-first two ([fingerprint.md](fingerprint.md)). With Cache Components enabled,
+to it (an RSC request), and for a `<Link>` prefetch. Only the first is counted
+here. On Next 16.3.6 the `headers()` a Server Component reads leaves out the
+flight headers (`rsc`, `next-router-prefetch`, `next-router-segment-prefetch`),
+so a client-side navigation reaches the page as `Sec-Fetch-Dest: empty` with
+no `rsc`, and `isPageView` drops it together with the prefetches it can no
+longer tell apart. Reproduced against `next start`: the same page logged
+`{"rsc":null,"dest":"empty"}` for a request sent with `rsc: 1`. A shared link's
+first open is always a document request, so the announcement is unaffected;
+what is not logged is moving to the resource from another page of the app.
+Counting those needs the raw headers, which only `proxy.ts` sees: classify
+there with `isPageView` and pass the verdict to the page in a request header
+the proxy always overwrites. That is a design, not shipped and not run.
+
+With Cache Components enabled,
 the component that reads `headers()` must sit inside `<Suspense>`, and the
 tracking call belongs in that component.
 

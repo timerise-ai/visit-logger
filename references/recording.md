@@ -328,7 +328,9 @@ export function getVisitStore(): VisitStore {
 ```
 
 This is the one file that names a backend. The store is created lazily, inside
-`after()`, so a missing key is a log line rather than a broken page.
+`after()`, so a missing key is a log line rather than a broken page. Its two
+variables go in `.env.example` under these names, empty, and are read nowhere
+else; the handover in [operations.md](operations.md) lists them.
 
 ## Announcing
 
@@ -364,6 +366,11 @@ export function openedHeadline(subject: string, assessment: VisitAssessment): st
   return `${subject} came back to it`;
 }
 ```
+
+The sender (a Slack webhook post, an email) is the host's and lives in a file
+of its own, such as `lib/notify/slack.ts`, which the capture point's `announce`
+callback calls; `announce.ts` stays as written. A host that wants the first
+open only narrows inside that callback (`if (!assessment.isFirstVisit) return`).
 
 Never announce from anywhere else. The assessment already excludes bots and
 staff, applies the per-visitor window, and fails towards announcing. A second

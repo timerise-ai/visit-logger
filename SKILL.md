@@ -121,18 +121,25 @@ admin page --> readVisitSummary --> groupVisitsIntoSessions --> <VisitHistory>
 
 ## Quick start
 
-1. Probe the host, fill the seams, confirm the rename: [adaptation.md](references/adaptation.md).
-2. Copy the types and the fingerprint, and pick the edge adapter:
-   [fingerprint.md](references/fingerprint.md).
+Every template is copied as written: the rename is the only edit, and the host's
+code (the sender, the access check) goes in files of its own. The package
+registry is not an external service; install what the templates import.
+
+1. Probe the host, fill the seams, confirm the rename (unattended: apply it and
+   list it as an assumption). The subject comes only from the host's
+   authorisation, never the query string: [adaptation.md](references/adaptation.md).
+2. Copy the types and the fingerprint, pick the edge adapter: [fingerprint.md](references/fingerprint.md).
 3. Create the tables or the Firestore indexes: [data-model.md](references/data-model.md).
 4. Copy the rules, the write and read paths, and one store: [rules.md](references/rules.md),
    [recording.md](references/recording.md), [stores.md](references/stores.md).
 5. Call it from the resource's route or page, and from sign-in:
    [capture.md](references/capture.md).
 6. Add the history panels to the admin page: [admin-ui.md](references/admin-ui.md).
-7. Schedule retention, write the erasure path, run the checks:
-   [operations.md](references/operations.md).
-8. Run the suites in the host's runner: [testing.md](references/testing.md).
+7. Schedule retention, write the erasure path: [operations.md](references/operations.md).
+8. `npm i -D vitest`, copy the three suites unchanged, wire `vitest run` to
+   `npm test`: 55 tests. Never convert them: [testing.md](references/testing.md).
+9. Hand over: the migration, the purge schedule, the privacy-policy line, the
+   edge assumed, the env names: [operations.md](references/operations.md).
 
 ## Reference directory
 
@@ -146,8 +153,8 @@ admin page --> readVisitSummary --> groupVisitsIntoSessions --> <VisitHistory>
 | Backends | Supabase, supabase-js, service role, Firestore, firebase-admin, NULL, memory store | [stores.md](references/stores.md) |
 | Where to call it | route handler, Server Component, headers(), sign-in, magic link, auth callback, signInWithOtp, email_confirmed_at | [capture.md](references/capture.md) |
 | The admin panels | visit history, activity, badge, bot row, "first opened", duration | [admin-ui.md](references/admin-ui.md) |
-| Running it | GDPR, retention, purge, erasure, pg_cron, mail scanner, Safe Links, internal traffic, debugging | [operations.md](references/operations.md) |
-| Proving it | vitest, bun test, test cases, fixtures | [testing.md](references/testing.md) |
+| Running it | GDPR, retention, purge, erasure, pg_cron, handover, .env.example, mail scanner, Safe Links, internal traffic, debugging | [operations.md](references/operations.md) |
+| Proving it | vitest, bun test, npm test, test cases, fixtures | [testing.md](references/testing.md) |
 | What the audit changed and why | provenance, defect, audit, kept deliberately, upgrading an existing log | [provenance.md](references/provenance.md) |
 
 Part of the [Timerise Skills](https://github.com/timerise-ai/skills) index, which lists the sibling skills.

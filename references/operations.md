@@ -127,8 +127,28 @@ SELECT count(*) AS misfiled_as_returning
  WHERE email_confirmed_at - created_at > INTERVAL '5 minutes';
 ```
 
+## Handover
+
+The code is half of the change; the rest is done by whoever deploys it, so the
+final report tells them, in this order:
+
+1. **The migration to apply**, by file name, and that nothing is logged until it is.
+2. **The purge to schedule**, with the period chosen and the statement above.
+3. **The privacy-policy line**: IP, approximate location, browser and device are
+   recorded when a shared link is opened, for attribution, for the period above.
+4. **The edge assumed** (`vercelEdge`, `cloudflareEdge` or `noEdge`) and what to
+   change if a Cloudflare proxy sits in front of Vercel.
+5. **The env variables**, as `.env.example` lists them: tracked, every value
+   empty, no secret in any tracked file. For Supabase that is
+   `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`, the names
+   `store.ts` reads, plus whatever the host's sender needs (a Slack webhook URL,
+   say). Rename them only in `store.ts` and `.env.example` together.
+6. **The limit**: a mail scanner that presents a normal browser can still look
+   like the first open.
+
 ## Operations checklist
 
+- [ ] Handover written: migration, purge, privacy line, edge, env, limit
 - [ ] Legal basis and privacy text written; the purpose names attribution
 - [ ] Purge scheduled; period agreed
 - [ ] Erasure path documented for support

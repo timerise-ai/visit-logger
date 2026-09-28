@@ -422,6 +422,13 @@ header names come from Next 16.2's own router constants; the behaviour has not
 been exercised in production. A `router.refresh()` is an RSC request with no
 prefetch header and counts as a page view; that is usually what you want.
 
+Those rows need the raw request headers, which a route handler and `proxy.ts`
+have and a Server Component does not. On Next 16.3.6, `headers()` in a page
+leaves out `rsc` and both prefetch headers (`HIDDEN_REQUEST_HEADERS` in
+`request-store.js`), so there a client navigation and a `<Link>` prefetch both
+arrive as `Sec-Fetch-Dest: empty` and neither counts. The last row of the test
+table pins that; [capture.md](capture.md) says what it means for a page.
+
 A route handler that serves HTML files, as in the earlier implementation, only ever sees the
 first six rows. Check the content type as well: only an HTML response is a page.
 

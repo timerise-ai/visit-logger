@@ -83,7 +83,7 @@ The announcement decision was interleaved with its two queries, and the
 sign-up origin selection sat inside a database read. Only the grouping was a
 pure function, and nothing tested it.
 
-**Shipped:** `core.ts` (pure), the `VisitStore` seam, a memory store, and 54
+**Shipped:** `core.ts` (pure), the `VisitStore` seam, a memory store, and 55
 tests. See [testing.md](testing.md).
 
 ### 7. The fingerprint mapped four times
@@ -153,7 +153,12 @@ fallback, beside the shared helper. They would drift the day the edge changed.
   against Next 16.2.12's router constants; the behaviour has not been
   exercised in a running app.
 - The Server Component capture point, the admin page example, and the Supabase
-  Auth sign-in routes as templates.
+  Auth sign-in routes as templates. Found by the 0.1.2 agent eval and
+  reproduced against `next start` on Next 16.3.6: a page's `headers()` hides
+  the flight headers, so the page counts document requests only and not the
+  client navigations its comment promised. The comment, the contract in
+  [fingerprint.md](fingerprint.md) and a test row now say so; classifying in
+  `proxy.ts` to count them is a design, not shipped.
 - `cloudflareEdge` and `utf8FromLatin1` (the Latin-1 decoding was reproduced;
   the header names come from Cloudflare's documentation), and `noEdge`.
 - The Firestore store and its indexes.

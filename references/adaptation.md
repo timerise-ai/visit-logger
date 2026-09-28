@@ -68,7 +68,22 @@ Leave platform terms alone: `ip`, `userAgent`, `referrer`, `timezone`,
 
 **Confirm the rename with the user.** It is the one column the probe cannot
 infer, and a half-applied rename teaches the next reader that both names are
-live.
+live. Working unattended, with nobody to ask, either keep the canonical names
+or apply the rename whole, and list the choice as an assumption.
+
+## Where the host's code goes
+
+The templates are copied as written; the rename is the only edit to them. The
+host's own code goes in files of its own and calls the templates: the sender
+that posts to Slack, the access check that produces `{ subject, via }`, the
+admin page. A change a template seems to need is a finding to report with the
+input that shows it, not an edit: the suites pin the templates' behaviour, and
+an edited template no longer matches the ledger in [provenance.md](provenance.md).
+
+Install what the templates import (`@supabase/supabase-js` or `firebase-admin`,
+and `vitest` for the suites). The package registry is not an external service,
+even where the app's own services are unreachable; a hand-written REST client
+or a converted suite is a new module nobody has verified.
 
 ## Choosing the edge adapter
 
@@ -108,6 +123,13 @@ order of the checks matters:
 Anything the host cannot attribute to a resource is not logged at all. An admin
 opening a resource that no customer owns yet has nothing to be attributed to.
 
+**When the host has no share-link check**, add one before logging anything: a
+random token per resource and recipient, stored server-side with the
+recipient's subject, and a link that carries only the token. Never read the
+subject from the query string (`?email=`) or any other value the visitor
+typed. A log that takes the name from the URL lets anyone make it say, and the
+announcement post, that a customer opened something they never saw.
+
 ## Strings
 
 The panels take a strings object; the formatters return language-neutral
@@ -136,7 +158,8 @@ decisions are part of the behaviour and must survive the restyle:
 - [ ] Seam table filled for this host; rename confirmed with the user
 - [ ] One IP reader in the codebase, from the chosen `EdgeHeaders`
 - [ ] Edge adapter matches the real edge, including a Cloudflare proxy in front
-- [ ] `via` produced by the host's authorisation, staff check first
+- [ ] `via` produced by the host's authorisation, staff check first; the subject never from the URL
+- [ ] Templates copied as written; host code in its own files; dependencies installed
 - [ ] Store implementation matches the host's data-access style ([stores.md](stores.md))
 - [ ] Strings in the host's i18n system; panels on the host's primitives
 - [ ] Retention period chosen and the privacy policy says what is kept ([operations.md](operations.md))
