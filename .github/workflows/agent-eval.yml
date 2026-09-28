@@ -1,0 +1,49 @@
+# Runs this skill through coding agents on a fresh Next.js app and commits the
+# result to evals/. The harness is in timerise-ai/skills (eval/ and
+# .github/workflows/agent-eval.yml); this file is the same in every skill.
+name: Agent eval
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      agent:
+        description: Agent
+        type: choice
+        options: [claude-code, codex, gemini-cli]
+        default: claude-code
+      prompt:
+        description: Prompt number in evals/prompts.md
+        type: number
+        default: 1
+
+permissions:
+  contents: write
+
+concurrency:
+  group: agent-eval
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.event_name == 'release'
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        agent: [claude-code, codex, gemini-cli]
+    uses: timerise-ai/skills/.github/workflows/agent-eval.yml@main
+    with:
+      agent: ${{ matrix.agent }}
+      prompt: 1
+    secrets: inherit
+
+  manual:
+    if: github.event_name == 'workflow_dispatch'
+    uses: timerise-ai/skills/.github/workflows/agent-eval.yml@main
+    with:
+      agent: ${{ inputs.agent }}
+      # A dispatch input arrives as a string; the reusable workflow's prompt is a number.
+      prompt: ${{ fromJSON(inputs.prompt) }}
+    secrets: inherit
