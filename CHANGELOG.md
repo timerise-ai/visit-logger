@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-09-28
+
+Wording release, from scoring the prompt-1 agent eval runs against 0.1.3. The
+templates' code is unchanged; one template comment is.
+
+### Changed
+
+- The `store.ts` comment in `recording.md` says the file is copied as written,
+  variable names included, and that only a host with an existing service-role
+  client factory calls it there. It used to invite replacing the body with the
+  host's own factory, and new apps wrote one.
+- `recording.md` says why `NEXT_PUBLIC_SUPABASE_URL` keeps its name: server code
+  reads it at run time. Verified on Next 16.3.6 by building a route handler with
+  the variable unset and starting it with the variable set.
+- The handover in `operations.md` and the quick start in `SKILL.md` say the
+  final report itself carries all six items, not a README it points to.
+
 ## [0.1.3] - 2026-09-28
 
 Fix release, from scoring the prompt-1 agent eval runs against 0.1.2.
