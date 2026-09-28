@@ -130,7 +130,7 @@ SELECT count(*) AS misfiled_as_returning
 ## Handover
 
 The code is half of the change; the rest is done by whoever deploys it, so the
-final report tells them, in this order:
+final report itself tells them, in this order, whatever a README also says:
 
 1. **The migration to apply**, by file name, and that nothing is logged until it is.
 2. **The purge to schedule**, with the period chosen and the statement above.

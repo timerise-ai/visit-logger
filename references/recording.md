@@ -311,10 +311,11 @@ import { createSupabaseVisitStore } from "./supabase-store";
 
 /**
  * The one place the backend is chosen. Server-only: it holds the service-role
- * key. Replace the body with the host's own service-role client factory, or
- * with `createFirestoreVisitStore(getFirestore())`. Throws when unconfigured;
- * `trackPageVisit` calls it inside `after()`, so that failure is logged and
- * the page still renders.
+ * key. Copied as written, variable names included. Only a host that already
+ * has a service-role client factory calls that here instead; a Firestore host
+ * returns `createFirestoreVisitStore(getFirestore())`. Throws when
+ * unconfigured; `trackPageVisit` calls it inside `after()`, so that failure is
+ * logged and the page still renders.
  */
 export function getVisitStore(): VisitStore {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -331,6 +332,15 @@ This is the one file that names a backend. The store is created lazily, inside
 `after()`, so a missing key is a log line rather than a broken page. Its two
 variables go in `.env.example` under these names, empty, and are read nowhere
 else; the handover in [operations.md](operations.md) lists them.
+
+Keep `NEXT_PUBLIC_SUPABASE_URL`; there is no build-time reason to rename it.
+Next inlines `NEXT_PUBLIC_*` into browser bundles, but server code reads it at
+run time: on Next 16.3.6 a route handler built with the variable unset and
+started with it set returned the value it was started with. The URL is not a
+secret either; the service-role key is, and it has no `NEXT_PUBLIC_` prefix. A
+new app gets no new client factory for this file: writing one to share it is
+an edit to the template, and the usual way one variable ends up with two
+names.
 
 ## Announcing
 
