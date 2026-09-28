@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-09-28
+
+Fix release, from scoring the prompt-1 agent eval runs against 0.1.2.
+
+### Fixed
+
+- The App Router page in `capture.md` said it counted client-side navigations.
+  On Next 16.3.6 `headers()` in a Server Component hides the flight headers
+  (`rsc` and both prefetch headers), so a client navigation arrives as
+  `Sec-Fetch-Dest: empty` and `isPageView` drops it. Reproduced against
+  `next start`. The page comment, the page-view contract in `fingerprint.md`
+  and the provenance now say the page counts document requests only, and a new
+  `isPageView` row pins it: 55 tests. First-open announcements are unaffected,
+  since a shared link's first open is a document request. Apps built from
+  earlier versions need no code change; classifying in `proxy.ts` to count
+  client navigations is described as a design, not shipped.
+
+### Changed
+
+- The quick start in `SKILL.md` says every template is copied as written, that
+  the package registry is not an external service, to install `vitest` and run
+  the suites unchanged under `npm test`, that the subject never comes from the
+  query string, and to finish with a handover.
+- `adaptation.md` says where the host's own code goes, what to do unattended
+  with the rename, and that a host with no share-link check gets a server-side
+  token rather than a `?email=` parameter.
+- `testing.md` forbids converting the suites to another runner.
+- `recording.md` names the store's env variables for `.env.example` and puts
+  the host's sender in a file of its own, narrowing to the first open inside
+  the `announce` callback.
+- `operations.md` gains a handover section: the migration, the purge schedule,
+  the privacy-policy line, the edge assumed, the env variables and the limit.
+
 ## [0.1.2] - 2026-09-28
 
 Documentation release. The skill content is unchanged from 0.1.1.
