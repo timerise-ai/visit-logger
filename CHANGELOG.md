@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-09-28
+
+Fix release, from scoring the prompt-1 agent eval runs against 0.1.4.
+
+### Fixed
+
+- A failed prior-visit read was indistinguishable from a return. `ANNOUNCE_UNKNOWN`
+  and a return after the window were the same assessment, so `openedHeadline`
+  announced a failed read as "came back to it", and a host announcing first
+  opens only (as `recording.md` advised since 0.1.3) dropped the ping the
+  failure contract exists to send. `VisitAssessment` gains `noveltyKnown`, the
+  headline says earlier visits could not be checked, and the advice now keeps
+  that case: `if (!assessment.isFirstVisit && assessment.noveltyKnown) return`.
+  A new `core.test.ts` case fails on the old code: 56 tests. Apps built from
+  earlier versions copy `core.ts` and `announce.ts` again, and any code that
+  builds a `VisitAssessment` by hand adds the field.
+
+### Changed
+
+- `recording.md` rules out retry queues, outboxes, cron re-senders and SQL
+  triggers that decide the first open on their own: each is a second place
+  that announces.
+
 ## [0.1.4] - 2026-09-28
 
 Wording release, from scoring the prompt-1 agent eval runs against 0.1.3. The
