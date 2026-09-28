@@ -23,3 +23,9 @@ isolated: true
 timedOut: false
 runUrl: https://github.com/timerise-ai/visit-logger/actions/runs/36451567713
 ---
+
+Rubric 8/8, scored from the final summary. Templates copied unchanged with host code in files of its own, the
+three suites unchanged (56 of 56) under vitest, the subject from a server-side token, the documented variable
+names, and all six handover items in the report. It keeps the failed-read ping and says so. Its edge advice
+points at the default in `track.ts` rather than the `edge` option at the call site, which is wording, not a
+deviation.
