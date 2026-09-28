@@ -1,6 +1,6 @@
 # Testing
 
-Three suites, 55 tests. They cover the claims the skill makes: the rules in
+Three suites, 56 tests. They cover the claims the skill makes: the rules in
 [rules.md](rules.md), the fingerprint and page-view contract in
 [fingerprint.md](fingerprint.md), and the failure contract in
 [recording.md](recording.md), against the memory store from
@@ -21,14 +21,14 @@ edit an assertion to make it pass: a converted suite is new code that proves
 nothing about the templates. Tests of the host's own code go in files beside
 them.
 
-Verified under vitest 5 and bun 1.2 (55 passing in each), and type-checked
+Verified under vitest 5 and bun 1.2 (56 passing in each), and type-checked
 with TypeScript 6 under `strict` and `noUncheckedIndexedAccess` together with
 every other code block in the skill. `fingerprint.test.ts` needs `next/server`,
 which any Next.js app has.
 
 | Suite | Proves |
 |---|---|
-| `core.test.ts` | sittings join and split on the gap from the last view; visitors interleave; input not mutated; bot taint; entry referrer; counts exclude bots and staff; truncated `firstAt`; the announcement matrix; origin preference and fallbacks |
+| `core.test.ts` | sittings join and split on the gap from the last view; visitors interleave; input not mutated; bot taint; entry referrer; counts exclude bots and staff; truncated `firstAt`; the announcement matrix; a failed read never headlined as a return; origin preference and fallbacks |
 | `fingerprint.test.ts` | Vercel IP and decoded city; malformed escape survives; major-only client line; every automated client flagged and no real browser flagged (CUBOT included); Cloudflare Latin-1 repair; `noEdge`; the full `isPageView` contract |
 | `record.test.ts` | first, then quiet, then back; NULL IP matches NULL IP; bots and staff stored, never announced, never "prior"; read failure announces; write failure is quiet; truncation with the real first visit; failed reads say so; subject normalisation both ways |
 
@@ -38,7 +38,9 @@ which any Next.js app has.
 // file: lib/visits/core.test.ts
 import { describe, expect, it } from "vitest";
 
+import { openedHeadline } from "./announce";
 import {
+  ANNOUNCE_UNKNOWN,
   assessVisit,
   groupVisitsIntoSessions,
   pickOriginEvent,
@@ -158,12 +160,13 @@ describe("assessVisit", () => {
       isFirstVisit: true,
       isNewVisitor: true,
       shouldAnnounce: true,
+      noveltyKnown: true,
     });
   });
 
   it("announces a second person inside someone else's window", () => {
     const result = assessVisit({ lastHumanAt: at(59), lastSameVisitorAt: null }, now);
-    expect(result).toEqual({ isFirstVisit: false, isNewVisitor: true, shouldAnnounce: true });
+    expect(result).toEqual({ isFirstVisit: false, isNewVisitor: true, shouldAnnounce: true, noveltyKnown: true });
   });
 
   it("stays quiet for the same visitor inside the window", () => {
@@ -174,7 +177,16 @@ describe("assessVisit", () => {
   it("announces the same visitor again after the window", () => {
     const lastSeen = new Date(now - SESSION_WINDOW_MS - 1).toISOString();
     const result = assessVisit({ lastHumanAt: lastSeen, lastSameVisitorAt: lastSeen }, now);
-    expect(result).toEqual({ isFirstVisit: false, isNewVisitor: false, shouldAnnounce: true });
+    expect(result).toEqual({ isFirstVisit: false, isNewVisitor: false, shouldAnnounce: true, noveltyKnown: true });
+  });
+
+  it("does not headline a failed read as a return", () => {
+    const lastSeen = new Date(now - SESSION_WINDOW_MS - 1).toISOString();
+    const back = assessVisit({ lastHumanAt: lastSeen, lastSameVisitorAt: lastSeen }, now);
+    expect(openedHeadline("ada@example.com", back)).toBe("ada@example.com came back to it");
+    expect(openedHeadline("ada@example.com", ANNOUNCE_UNKNOWN)).toBe(
+      "ada@example.com opened it; earlier visits could not be checked",
+    );
   });
 });
 
@@ -414,9 +426,9 @@ describe("recordPageVisit", () => {
     clock.advance(31);
     const back = await recordPageVisit(store, VISIT, { now: clock.now() });
 
-    expect(first).toEqual({ isFirstVisit: true, isNewVisitor: true, shouldAnnounce: true });
+    expect(first).toEqual({ isFirstVisit: true, isNewVisitor: true, shouldAnnounce: true, noveltyKnown: true });
     expect(second.shouldAnnounce).toBe(false);
-    expect(back).toEqual({ isFirstVisit: false, isNewVisitor: false, shouldAnnounce: true });
+    expect(back).toEqual({ isFirstVisit: false, isNewVisitor: false, shouldAnnounce: true, noveltyKnown: true });
     expect(visits).toHaveLength(3);
     expect(visits[0]?.subject).toBe("ada@example.com");
   });
@@ -446,7 +458,7 @@ describe("recordPageVisit", () => {
   it("announces when the prior-visit read fails, and still writes the row", async () => {
     const { store, visits } = createMemoryVisitStore({ fail: ["readPriorVisits"] });
     const result = await recordPageVisit(store, VISIT);
-    expect(result).toEqual({ isFirstVisit: false, isNewVisitor: false, shouldAnnounce: true });
+    expect(result).toEqual({ isFirstVisit: false, isNewVisitor: false, shouldAnnounce: true, noveltyKnown: false });
     expect(visits).toHaveLength(1);
   });
 
@@ -523,6 +535,6 @@ describe("visitor events", () => {
 
 ## Testing checklist
 
-- [ ] All three suites copied unchanged, wired to `npm test`, 55 passing under vitest or bun
+- [ ] All three suites copied unchanged, wired to `npm test`, 56 passing under vitest or bun
 - [ ] A new `looksAutomated` pattern arrives with a test row for it, and a real-browser row it must not match
 - [ ] One end-to-end open in the running host: row written, bot flag right, announcement received once

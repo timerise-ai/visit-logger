@@ -83,7 +83,7 @@ The announcement decision was interleaved with its two queries, and the
 sign-up origin selection sat inside a database read. Only the grouping was a
 pure function, and nothing tested it.
 
-**Shipped:** `core.ts` (pure), the `VisitStore` seam, a memory store, and 55
+**Shipped:** `core.ts` (pure), the `VisitStore` seam, a memory store, and 56
 tests. See [testing.md](testing.md).
 
 ### 7. The fingerprint mapped four times
@@ -166,6 +166,11 @@ fallback, beside the shared helper. They would drift the day the edge changed.
   index for erasure.
 - The memory store, the three suites, and the structure-only panels with
   strings objects.
+- `noveltyKnown` on `VisitAssessment`. Found by the 0.1.4 agent eval and
+  reproduced against the templates: `ANNOUNCE_UNKNOWN` and a return after the
+  window were the same object, so `openedHeadline` announced a failed read as
+  "came back to it", and a host announcing first opens only dropped the ping
+  the failure contract keeps. A test in `core.test.ts` fails on the old code.
 
 ## If you are upgrading an existing log
 

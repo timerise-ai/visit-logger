@@ -94,7 +94,7 @@ the skill stays cheap in context until a topic is actually needed.
 | `references/capture.md` | Where to call it: a gated route handler, an App Router page, Supabase Auth sign-in |
 | `references/admin-ui.md` | The history and activity panels, the origin line, the admin page |
 | `references/operations.md` | Privacy, retention, erasure, health checks, the limits no code removes |
-| `references/testing.md` | The three suites, 55 tests, and how to run them under vitest or bun |
+| `references/testing.md` | The three suites, 56 tests, and how to run them under vitest or bun |
 | `references/provenance.md` | The engineering ledger: what the audit changed and how the templates verify it, what was kept on purpose, and what is new in the skill |
 | `evals/` | The prompts an operator types after installing (`prompts.md`) and one file per agent eval: the skill installed into an empty Next.js app, one prompt, no help, then type-checked, built and tested |
 
@@ -164,7 +164,7 @@ to support it; both are in `references/operations.md`, with the wording a privac
 
 Issues and pull requests are welcome here. Pure markdown, with no build step, but the code blocks are checked:
 every block names its destination on the first line, and every TypeScript block is written to compile as one
-project under `strict` and `noUncheckedIndexedAccess` and to run under vitest and `bun test`, 55 tests. The
+project under `strict` and `noUncheckedIndexedAccess` and to run under vitest and `bun test`, 56 tests. The
 SQL is applied twice against PostgreSQL with Supabase's roles and default privileges recreated. Claims in this
 skill are meant to be verifiable: if you change a factual claim, say how you verified it, whether against
 Next's `userAgent()`, the platform's header documentation, Node's HTTP parser, PostgreSQL, the Supabase Auth

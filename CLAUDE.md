@@ -52,7 +52,7 @@ anything.
   npm i -D typescript@6 next@16 react@19 react-dom@19 @types/react @types/node \
     @supabase/supabase-js firebase-admin vitest
   npx tsc --noEmit    # strict, noUncheckedIndexedAccess, skipLibCheck, jsx react-jsx, paths {"@/*": ["./*"]}
-  npx vitest run lib/visits && bun test lib/visits    # 55 tests each
+  npx vitest run lib/visits && bun test lib/visits    # 56 tests each
   ```
 
   Do not set `baseUrl`, which TypeScript 6 removed. The `declare function` lines in the route and page

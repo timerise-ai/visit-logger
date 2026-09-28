@@ -369,8 +369,9 @@ export function originLines(fingerprint: VisitFingerprint): string[] {
   return lines;
 }
 
-/** "opened for the first time" / "opened again, from a new device" / "came back". */
+/** "first time" / "new device" / "came back", or nothing claimed when the read failed. */
 export function openedHeadline(subject: string, assessment: VisitAssessment): string {
+  if (!assessment.noveltyKnown) return `${subject} opened it; earlier visits could not be checked`;
   if (assessment.isFirstVisit) return `${subject} opened it for the first time`;
   if (assessment.isNewVisitor) return `${subject} opened it from a new device or network`;
   return `${subject} came back to it`;
@@ -380,7 +381,15 @@ export function openedHeadline(subject: string, assessment: VisitAssessment): st
 The sender (a Slack webhook post, an email) is the host's and lives in a file
 of its own, such as `lib/notify/slack.ts`, which the capture point's `announce`
 callback calls; `announce.ts` stays as written. A host that wants the first
-open only narrows inside that callback (`if (!assessment.isFirstVisit) return`).
+open only narrows inside that callback, and keeps the failed-read case:
+`if (!assessment.isFirstVisit && assessment.noveltyKnown) return`. Narrowing on
+`isFirstVisit` alone silences the ping the failure contract exists to send.
+
+No retry queue, outbox, cron re-sender or SQL trigger that decides "first
+open" on its own. Each is a second place that announces, with its own idea of
+what counts, and none of them reads `assessVisit`. A lost Slack post is logged
+and the history panel still shows the open; the duplicate-ping race is a
+documented limit ([operations.md](operations.md)).
 
 Never announce from anywhere else. The assessment already excludes bots and
 staff, applies the per-visitor window, and fails towards announcing. A second

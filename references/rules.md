@@ -44,6 +44,10 @@ once.
 | yes | yes | beyond the window | false | false | **yes**: they came back |
 | read failed | | | false | false | **yes**: losing the throttle beats losing the ping |
 
+`noveltyKnown` is true in every row but the last. Without it a failed read and
+a return look the same, and a host that announces first opens only would drop
+exactly the ping the last row exists to keep.
+
 The window is **per visitor, not per resource**. Two different people opening
 the same proposal within five minutes are two announcements, and the second
 one is usually the more interesting (the champion forwarded it).
@@ -187,12 +191,18 @@ export interface VisitAssessment {
   isNewVisitor: boolean;
   /** First ever, a new visitor, or a returning one after a break. */
   shouldAnnounce: boolean;
+  /**
+   * False when the prior-visit read failed: then the two flags above mean
+   * nothing, and "not first" must not be read as "came back".
+   */
+  noveltyKnown: boolean;
 }
 
 export const QUIET: VisitAssessment = {
   isFirstVisit: false,
   isNewVisitor: false,
   shouldAnnounce: false,
+  noveltyKnown: false,
 };
 
 /**
@@ -203,6 +213,7 @@ export const ANNOUNCE_UNKNOWN: VisitAssessment = {
   isFirstVisit: false,
   isNewVisitor: false,
   shouldAnnounce: true,
+  noveltyKnown: false,
 };
 
 /**
@@ -225,6 +236,7 @@ export function assessVisit(
     isFirstVisit,
     isNewVisitor,
     shouldAnnounce: isFirstVisit || isNewVisitor || elapsed > windowMs,
+    noveltyKnown: true,
   };
 }
 

@@ -137,7 +137,7 @@ registry is not an external service; install what the templates import.
 6. Add the history panels to the admin page: [admin-ui.md](references/admin-ui.md).
 7. Schedule retention, write the erasure path: [operations.md](references/operations.md).
 8. `npm i -D vitest`, copy the three suites unchanged, wire `vitest run` to
-   `npm test`: 55 tests. Never convert them: [testing.md](references/testing.md).
+   `npm test`: 56 tests. Never convert them: [testing.md](references/testing.md).
 9. Hand over in the final report, all six: migration, purge, privacy line, edge,
    env names, scanner limit: [operations.md](references/operations.md).
 
