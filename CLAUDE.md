@@ -32,6 +32,13 @@ anything.
   design entry points; `rules.md` holds the pure decisions; `recording.md`, `stores.md` and `capture.md` the
   wiring; `admin-ui.md` the panels; `operations.md` running it; `testing.md` the suites; `provenance.md` the
   ledger.
+- `evals/`: `prompts.md` holds what an operator types after installing, in their words; the first prompt
+  is the agent eval run before every release. Every other file there is one eval run: measured frontmatter
+  that is never edited, then the notes of the person who ran it. Add a prompt rather than rewording one that
+  has results. The procedure is section 10 of the index's STANDARD.md.
+- `.github/workflows/agent-eval.yml`: the caller of the index's reusable eval workflow, run on every
+  published release and on a maintainer's dispatch. It is the same in every skill and was set up by a
+  maintainer; do not edit it, and never add a trigger on `push` or `pull_request`.
 
 ## Editing conventions
 
@@ -86,4 +93,7 @@ anything.
 - **Claims are verifiable.** A changed factual claim says how it was verified: against Next's `userAgent()`,
   the platform's header documentation, Node's HTTP parser, PostgreSQL, the Supabase Auth server, or a
   reproduction. Never from memory.
+- **Evals are not skill content.** A new prompt or an eval result is committed as `chore(evals): ...`,
+  never causes a version bump and never rides in a release commit. The frontmatter of a result file is what
+  was measured and is not edited; a failing run stays committed, and the fix is the next release.
 - **Commits follow Conventional Commits**, and no file or commit message names a tool or a model as author.

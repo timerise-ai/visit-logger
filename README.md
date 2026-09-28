@@ -96,6 +96,7 @@ the skill stays cheap in context until a topic is actually needed.
 | `references/operations.md` | Privacy, retention, erasure, health checks, the limits no code removes |
 | `references/testing.md` | The three suites, 54 tests, and how to run them under vitest or bun |
 | `references/provenance.md` | The engineering ledger: what the audit changed and how the templates verify it, what was kept on purpose, and what is new in the skill |
+| `evals/` | The prompts an operator types after installing (`prompts.md`) and one file per agent eval: the skill installed into an empty Next.js app, one prompt, no help, then type-checked, built and tested |
 
 The seam is the `VisitStore` interface in `references/stores.md` and the table at the top of
 `references/adaptation.md`. It bounds four things: the store, so Supabase, Firestore or memory are the same
